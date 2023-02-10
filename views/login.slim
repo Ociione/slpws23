@@ -1,0 +1,11 @@
+h1.title Login
+
+.container
+    form class="login" action="/login" method="post"
+        label for="email" Email
+        input type="text" name="email" id="email" value="#{params[:email]}"
+        label for="password" Password
+        input type="password" name="password" id="password"
+        input type="submit" value="Login"
+        - if error
+          p.error = error

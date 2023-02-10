@@ -1,0 +1,13 @@
+h1.title Register
+
+.container
+    form class="register" action="/register" method="post"
+        label for="email" Email
+        input type="text" name="email" id="email" value="#{params[:email]}"
+        label for="password" Password
+        input type="password" name="password" id="password"
+        label for="password2" Confirm Password
+        input type="password" name="password2" id="password2"
+        input type="submit" value="Register"
+        - if error
+          p.error = error
