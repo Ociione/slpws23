@@ -22,6 +22,15 @@ get('/') do
         redirect('/login')
     end
 
+    # db = SQLite3::Database.new('db/database.db')
+    # db.results_as_hash = true
+
+    # cases = db.execute("SELECT * FROM case")
+    # balance = db.execute("SELECT balance FROM user WHERE id = ?")
+
+    # db.close
+
+    slim(:index)
 end
 
 get('/register') do
@@ -55,9 +64,10 @@ post('/register') do
     db = SQLite3::Database.new('db/database.db')
     db.results_as_hash = true
     password = BCrypt::Password.create(params['password'])
+    starting_balance = 5.0
 
     begin
-        db.execute("INSERT INTO user (email, password) VALUES (?, ?)", email, password)
+        db.execute("INSERT INTO user (email, password, balance) VALUES (?, ?, ?)", email, password, starting_balance)
     rescue
         redirect('/register?error=2')
     end

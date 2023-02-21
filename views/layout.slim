@@ -10,8 +10,8 @@ html lang="en"
     nav
         - if session[:token].nil?
           a href="/register" Register
-        - else
-          a href="/logout" Logout
+        / - else
+        /   a href="/logout" Logout
         - if session[:token].nil?
           a href="/login" Login
 

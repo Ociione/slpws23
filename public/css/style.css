@@ -1,0 +1,116 @@
+* {
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family:'Courier New', Courier, monospace;
+    background: #d6d4d4;
+}
+
+/* nav {
+  text-transform: uppercase;
+  text-decoration: none;
+  font-size: 1.5em;
+  font-weight:400;
+  background: rgb(177, 176, 176);
+  height: 8vh;
+  display:flex;
+  justify-content:space-around;
+  align-items:center;
+}
+
+nav > a {
+    text-decoration: none;
+    color: rgb(73, 73, 73);
+} */
+
+input {
+    display: block;
+}
+
+.container {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.register {
+    width: 20em;
+}
+
+.register > label {
+    margin-top: 0.5em;
+    display:inline-block;
+}
+
+.register > input {
+    padding: 0.5em;
+    padding-top: 0.5em;
+    padding-bottom: 0.5em;
+    box-sizing: border-box;
+    width: 100%;
+}
+
+.register > input[type="submit"] {
+    width: 100%;
+    border: none;
+    padding: 0;
+    margin: 0;
+    box-sizing: border-box;
+
+    margin-top: 1em;
+    height: 4em;
+
+    background-color: #6eaf8f;
+    color: #fff;
+    font-size: 1em;
+    font-weight: 800;
+    text-transform: uppercase;
+}
+
+.title {
+    margin-top: 3em;
+    text-align: center;
+    margin-bottom: 3em;
+}
+
+.login {
+    width: 20em;
+}
+
+.login > label {
+    margin-top: 1em;
+    display:inline-block;
+}
+
+.login > input {
+    padding: 0.5em;
+    padding-top: 0.5em;
+    padding-bottom: 0.5em;
+    box-sizing: border-box;
+    width: 100%;
+}
+
+.login > input[type="submit"] {
+    width: 100%;
+    border: none;
+    padding: 0;
+    margin: 0;
+    box-sizing: border-box;
+
+    margin-top: 1em;
+    height: 4em;
+
+    background-color: #6eaf8f;
+    color: #fff;
+    font-size: 1em;
+    font-weight: 800;
+    text-transform: uppercase;
+}
+
+.error {
+    color: red;
+    margin-top: 1em;
+}
