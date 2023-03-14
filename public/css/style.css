@@ -25,6 +25,42 @@ nav > a {
     color: rgb(73, 73, 73);
 } */
 
+.item1 {
+    grid-area: head;
+    display: flex;
+    justify-content:center;
+    align-items: center;
+}
+
+.item2 {
+    grid-area: menu;
+}
+
+.item3 {
+    grid-area: main;
+}
+
+.grid-container {
+    display: grid;
+    width: 98vw;
+    height: 97vh;
+    grid-template-columns: 20% 20% 20% 20% 20%;
+    grid-template-rows: 20% 20% 20% 20% 20%;
+    grid-template-areas: 
+    'head head head head head'
+    'menu main main main main'
+    'menu main main main main'
+    'menu main main main main'
+    'menu main main main main';
+    gap: 3px;
+    padding: 0px;
+    background-color: #6eaf8f;
+}
+
+.grid-container > div {
+    background-color: #d6d4d4;
+}
+
 input {
     display: block;
 }
