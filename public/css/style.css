@@ -32,6 +32,11 @@ nav > a {
     align-items: center;
 }
 
+.item1-2 {
+    position: relative;
+    left: 400px;
+}
+
 .item2 {
     grid-area: menu;
 }
@@ -40,10 +45,44 @@ nav > a {
     grid-area: main;
 }
 
+.item3-1{
+    position:relative;
+    left: 45%;
+}
+
+.item3-2{
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    padding: 30px;
+    background-color: blueviolet;
+    list-style: none;
+}
+
+.item3-2-1{
+    gap: 30px;
+    padding: 30px;
+}
+
+.item3-3{
+    display: flex;
+    flex-wrap: wrap;
+    align-items:center;
+    justify-content: flex-start;
+    padding: 30px;
+    list-style: none;
+}
+
+.item3-3-1{
+    gap: 30px;
+    padding: 30px;
+}
+
 .grid-container {
     display: grid;
-    width: 98vw;
-    height: 97vh;
+    width: 100vw;
+    height: 100vh;
     grid-template-columns: 20% 20% 20% 20% 20%;
     grid-template-rows: 20% 20% 20% 20% 20%;
     grid-template-areas: 
@@ -54,7 +93,8 @@ nav > a {
     'menu main main main main';
     gap: 3px;
     padding: 0px;
-    background-color: #6eaf8f;
+    background-color: #5175ca;
+    overflow: hidden;
 }
 
 .grid-container > div {

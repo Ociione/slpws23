@@ -1,5 +1,32 @@
-div class="grid-container"
-    div class="item1"
-        h1 hasardspelarN.se 
-    div class="item2"menu
-    div class="item3"main
+div.grid-container
+    div.item1
+        div.item1-1
+            h1 hasardspelarN.se 
+        div.item1-2
+            h3 = "#{email[0]['email']}"
+            h2 = "Tillgodohavande: #{balance[0]['balance']} Svenska riksdaler"
+    div.item2
+    p menu
+    div.item3
+        div.item3-1
+            h2 Skrin
+        ul.item3-2
+            - skrin.each do |c|
+                li.item3-2-1
+                    h3 = c["name"]
+                    h3 = c["buy_price"]
+                    form class="itemButton" action='/opencase/#{c["id"]}' method="post"
+                        input type="submit" value="öppna skrin"
+        div.item3-1 
+            h2 Föremål
+        ul.item3-3 
+            - items.each do |i|
+                li.item3-3-1 
+                    - if name[j]["name"] != nil 
+                        h3 = name[j]["name"]
+                    h3 = i["condition_float"].round(3)
+                    - j += 1
+                    form class="itemButton" action='/sellItem/#{i["id"]}' method="post"
+                        input type="submit" value="Sälj föremål"
+
+            
