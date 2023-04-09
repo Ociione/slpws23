@@ -30,13 +30,15 @@ get('/') do
     balance = db.execute("SELECT balance FROM user WHERE id = ?", decoded_token[0]['sub'])
     email = db.execute("SELECT email FROM user WHERE id = ?", decoded_token[0]['sub'])
     items = db.execute("SELECT * FROM u_item WHERE user_id = ?", decoded_token[0]['sub'])
-    name = db.execute("SELECT item.name FROM u_item LEFT JOIN item ON u_item.item_id = item.id")
+    name = db.execute("SELECT item.name, u_item.user_id FROM u_item LEFT JOIN item ON u_item.item_id = item.id WHERE u_item.user_id = ?", decoded_token[0]['sub'])
+    rarity = db.execute("SELECT item.rarity_class, u_item.user_id FROM u_item LEFT JOIN item ON u_item.item_id = item.id WHERE u_item.user_id = ?", decoded_token[0]['sub'])
     
     db.close
+    p items
 
     j = 0
 
-    slim(:index, locals:{skrin:skrin, balance:balance, email:email, items:items, name:name, j:j})
+    slim(:index, locals:{skrin:skrin, balance:balance, email:email, items:items, name:name, rarity:rarity, j:j})
 end
 
 get('/register') do
@@ -70,7 +72,7 @@ post('/register') do
     db = SQLite3::Database.new('db/database.db')
     db.results_as_hash = true
     password = BCrypt::Password.create(params['password'])
-    starting_balance = 10.0
+    starting_balance = 60.0
 
     begin
         db.execute("INSERT INTO user (email, password, balance) VALUES (?, ?, ?)", email, password, starting_balance)
@@ -124,7 +126,7 @@ post("/opencase/:id") do
     caseid = params[:id]
 
     #odds at 50:20:15:10:5
-    condition_float = rand()
+    condition_float = rand().round(3)
     caseRoll = rand()
     if caseRoll <= 0.05 
         rarity = 5
@@ -143,10 +145,30 @@ post("/opencase/:id") do
 
     user_id = db.execute("SELECT id FROM user WHERE id = ?", decoded_token[0]['sub'])
     item_id = db.execute("SELECT id FROM item WHERE case_id = #{caseid} AND rarity_class = #{rarity}")
+    b_price = db.execute("SELECT base_price FROM item WHERE id = #{item_id[0]["id"]}")
+    price = ((b_price[0]["base_price"]) / (condition_float + 0.5)).round(3)
 
-    db.execute("INSERT INTO u_item (user_id, item_id, condition_float) VALUES (?, ?, ?)", user_id[0]["id"], item_id[0]["id"], condition_float)
+    db.execute("INSERT INTO u_item (user_id, item_id, condition_float, price) VALUES (?, ?, ?, ?)", user_id[0]["id"], item_id[0]["id"], condition_float, price)
 
     db.close
 
     redirect('/')
+end
+
+post("/sellItem/:id") do
+
+    token = session[:token]
+    verified, decoded_token = verify_token(token)
+    if !verified
+        redirect('/login')
+    end
+
+    itemid = pramas[:id]
+
+
+    db = SQLite3::Database.new('db/database.db')
+    db.results_as_hash = true
+
+    db.close
+
 end

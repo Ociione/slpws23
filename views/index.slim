@@ -14,19 +14,18 @@ div.grid-container
             - skrin.each do |c|
                 li.item3-2-1
                     h3 = c["name"]
-                    h3 = c["buy_price"]
+                    h3 = c["buy_price"].to_s + "kr"
                     form class="itemButton" action='/opencase/#{c["id"]}' method="post"
                         input type="submit" value="öppna skrin"
         div.item3-1 
             h2 Föremål
-        ul.item3-3 
+        ul.item3-3  
             - items.each do |i|
-                li.item3-3-1 
-                    - if name[j]["name"] != nil 
+                - if name[j]["name"] != nil
+                    li class="rarity-#{rarity[j]["rarity_class"]}"
                         h3 = name[j]["name"]
-                    h3 = i["condition_float"].round(3)
-                    - j += 1
-                    form class="itemButton" action='/sellItem/#{i["id"]}' method="post"
-                        input type="submit" value="Sälj föremål"
-
+                        h4 = i["price"].to_s + "kr | " + i["condition_float"].round(3).to_s 
+                        form class="itemButton" action='/sellItem/#{i["id"]}' method="post"
+                            input type="submit" value="Sälj föremål"
+                - j += 1
             

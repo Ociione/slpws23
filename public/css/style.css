@@ -70,13 +70,42 @@ nav > a {
     flex-wrap: wrap;
     align-items:center;
     justify-content: flex-start;
-    padding: 30px;
     list-style: none;
 }
 
 .item3-3-1{
-    gap: 30px;
+    gap: 20px;
     padding: 30px;
+}
+
+.rarity-1{
+    margin: 5px;
+    padding: 10px;
+    background-color: rgb(86, 86, 248);
+}
+
+.rarity-2{
+    margin: 5px;
+    padding: 10px;
+    background-color: rgb(155, 11, 212);
+}
+
+.rarity-3{
+    margin: 5px;
+    padding: 10px;
+    background-color: rgb(255, 0, 200);
+}
+
+.rarity-4{
+    margin: 5px;
+    padding: 10px;
+    background-color: rgb(250, 29, 29);
+}
+
+.rarity-5{
+    margin: 5px;
+    padding: 10px;
+    background-color: rgb(255, 251, 0);
 }
 
 .grid-container {
