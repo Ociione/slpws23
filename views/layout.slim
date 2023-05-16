@@ -9,10 +9,15 @@ html lang="en"
   body
     nav
         - if session[:token].nil?
-          a href="/register" Register
-        / - else
-        /   a href="/logout" Logout
+          a href="/register"
+            h1 Register
         - if session[:token].nil?
-          a href="/login" Login
+          a href="/login"
+            h1 Login
+        - if session[:token]
+          form method="post" action="/logout"
+            button type="submit" 
+              h1 logout
+            
 
     == yield

@@ -5,8 +5,24 @@ div.grid-container
         div.item1-2
             h3 = "#{email[0]['email']}"
             h2 = "Tillgodohavande: #{balance[0]['balance']} Svenska riksdaler"
+            h4 = "Insättning/utdrag av riksdaler sker bara i heltal "
+            form class="balance" action="/deposit/" method="get"
+                input type="text" name="amount" id="amount"
+                input type="submit" value="Insättning"
+            form class="balance" action="/withdraw/" method="get"
+                input type="text" name="amount" id="amount"
+                input type="submit" value="Utdrag"
     div.item2
-    p menu
+        div.item2-1
+            h2 Användare
+        ul.item2-2
+            - users.each do |u|
+                li.item2-2-1
+                    h3 = u["email"]
+                    h3 = "Saldo: " + u["balance"].to_s
+                    - if admin[0]["admin"] == 1
+                        form action="/deleteuser/#{u["id"]}" method="post"
+                            input type="submit" value="Ta bort användare"
     div.item3
         div.item3-1
             h2 Skrin

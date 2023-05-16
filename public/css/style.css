@@ -8,23 +8,6 @@ body {
     background: #d6d4d4;
 }
 
-/* nav {
-  text-transform: uppercase;
-  text-decoration: none;
-  font-size: 1.5em;
-  font-weight:400;
-  background: rgb(177, 176, 176);
-  height: 8vh;
-  display:flex;
-  justify-content:space-around;
-  align-items:center;
-}
-
-nav > a {
-    text-decoration: none;
-    color: rgb(73, 73, 73);
-} */
-
 .item1 {
     grid-area: head;
     display: flex;
@@ -39,6 +22,13 @@ nav > a {
 
 .item2 {
     grid-area: menu;
+    display: flex;
+    flex-direction: column;
+}
+
+.item2-2-1 {
+    margin-bottom: 8px;
+    background-color: rgb(170, 140, 199);
 }
 
 .item3 {
@@ -180,6 +170,23 @@ input {
     text-align: center;
     margin-bottom: 3em;
 }
+
+/* .balance > input[type="submit"] {
+    width: 20%;
+    border: none;
+    padding: 0;
+    margin: 0;
+    box-sizing: border-box;
+
+    margin-top: 1em;
+    height: 4em;
+
+    background-color: #6e6faf;
+    color: #fff;
+    font-size: 1em;
+    font-weight: 800;
+    text-transform: uppercase;
+} */
 
 .login {
     width: 20em;
