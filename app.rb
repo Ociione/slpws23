@@ -4,40 +4,9 @@ require 'sqlite3'
 require 'bcrypt'
 require 'jwt'
 require_relative 'model.rb'
+include Model
 
 enable :sessions
-
-def verify_token(token)
-    begin
-        decoded_token = JWT.decode token, 'ojojoj!', true, { algorithm: 'HS256' }
-        return true, decoded_token
-    rescue JWT::DecodeError
-        return false, nil
-    end
-end
-
-def balance_change(action, amount, user_id)
-
-    db = SQLite3::Database.new('db/database.db')
-    db.results_as_hash = true
-
-    current_balance = db.execute("SELECT balance FROM user WHERE id = #{user_id}") 
-    
-    p current_balance[0]["balance"]
-    p amount
-
-    if action == "remove"
-        new_balance = (current_balance[0]["balance"] - amount).round(3)
-    elsif action == "add"
-        new_balance = (current_balance[0]["balance"] + amount).round(3)
-    end
-
-    p new_balance
-
-    db.execute("UPDATE user SET balance = #{new_balance} WHERE id = #{user_id}")
-
-    db.close
-end
 
 get('/') do
     token = session[:token]
@@ -46,19 +15,15 @@ get('/') do
         redirect('/login')
     end
 
-    db = SQLite3::Database.new('db/database.db')
-    db.results_as_hash = true
-
-    skrin = db.execute("SELECT * FROM cases")
-    balance = db.execute("SELECT balance FROM user WHERE id = ?", decoded_token[0]['sub'])
-    email = db.execute("SELECT email FROM user WHERE id = ?", decoded_token[0]['sub'])
-    items = db.execute("SELECT * FROM u_item WHERE user_id = ?", decoded_token[0]['sub'])
-    name = db.execute("SELECT item.name, u_item.user_id FROM u_item LEFT JOIN item ON u_item.item_id = item.id WHERE u_item.user_id = ?", decoded_token[0]['sub'])
-    rarity = db.execute("SELECT item.rarity_class, u_item.user_id FROM u_item LEFT JOIN item ON u_item.item_id = item.id WHERE u_item.user_id = ?", decoded_token[0]['sub'])
-    users = db.execute("SELECT * FROM user")
-
-    admin = db.execute("SELECT admin FROM user WHERE id = ?", decoded_token[0]['sub'])
-
+    db = db_initiate()
+    skrin = data_cases(db)
+    balance = balance_data(db, decoded_token)
+    email = mail_userdata(db, decoded_token) 
+    items = item_data(db, decoded_token)
+    name = user_item_rel(db, decoded_token)
+    rarity = user_rarity_rel(db, decoded_token)
+    users = user_data(db)
+    admin = admin_status(db, decoded_token)
     db.close
 
     j = 0
@@ -94,13 +59,14 @@ post('/register') do
         redirect('/register?error=1')
     end
 
-    db = SQLite3::Database.new('db/database.db')
-    db.results_as_hash = true
     password = BCrypt::Password.create(params['password'])
+
     starting_balance = 60.0
 
+    db = db_initiate()
+
     begin
-        db.execute("INSERT INTO user (email, password, balance) VALUES (?, ?, ?)", email, password, starting_balance)
+        reg_user(db, email, password, starting_balance)
     rescue
         redirect('/register?error=2')
     end
@@ -118,10 +84,8 @@ post('/login') do
         redirect('/login?error=1')
     end
 
-    db = SQLite3::Database.new('db/database.db')
-    db.results_as_hash = true
-
-    result = db.execute("SELECT * FROM user WHERE email = ?", email)
+    db = db_initiate()
+    result = user_email_data(db, email)
     db.close
 
     if result.empty?
@@ -151,10 +115,9 @@ end
 post('/deleteuser/:id') do
     user_id = params[:id]
 
-    db = SQLite3::Database.new('db/database.db')
-    db.results_as_hash = true
+    db = db_initiate()
 
-    db.execute("DELETE FROM user WHERE id = #{user_id}")
+    deleteuser(db, user_id)
 
     redirect('/')
 end
@@ -167,11 +130,8 @@ get("/deposit/?") do
         redirect('/login')
     end
 
-    db = SQLite3::Database.new('db/database.db')
-    db.results_as_hash = true
-
-    user_id = db.execute("SELECT id FROM user WHERE id = ?", decoded_token[0]['sub'])
-
+    db = db_initiate()
+    user_id = user_id_get(db, decoded_token) 
     db.close
 
     balance_change("add", params[:amount].to_i, user_id[0]["id"])
@@ -188,14 +148,9 @@ get("/withdraw/?") do
         redirect('/login')
     end
 
-    db = SQLite3::Database.new('db/database.db')
-    db.results_as_hash = true
-
-    user_id = db.execute("SELECT id FROM user WHERE id = ?", decoded_token[0]['sub'])
-
+    db = db_initiate()
+    user_id = user_id_get(db, decoded_token)
     db.close
-
-
 
     balance_change("remove", params[:amount].to_i, user_id[0]["id"])
 
@@ -213,16 +168,15 @@ post("/opencase/:id") do
 
     caseid = params[:id]
 
-    db = SQLite3::Database.new('db/database.db')
-    db.results_as_hash = true
+    db = db_initiate()
 
-    user_id = db.execute("SELECT id FROM user WHERE id = ?", decoded_token[0]['sub'])
-    current_balance = db.execute("SELECT balance FROM user WHERE id = #{user_id[0]["id"]}")
-    case_price = db.execute("SELECT buy_price FROM cases WHERE id = #{caseid}")
+    user_id = user_id_get(db, decoded_token)
+    current_balance = get_balance(db, user_id)
+    case_price = get_case_price(db, caseid)
 
+    p current_balance
+    p case_price
 
-    p current_balance[0]["balance"]
-    p case_price[0]["buy_price"]
     if current_balance[0]["balance"] >= case_price[0]["buy_price"]
 
         #odds at 50:20:15:10:5
@@ -240,14 +194,16 @@ post("/opencase/:id") do
             rarity = 1
         end
 
-        item_id = db.execute("SELECT id FROM item WHERE case_id = #{caseid} AND rarity_class = #{rarity}")
-        b_price = db.execute("SELECT base_price FROM item WHERE id = #{item_id[0]["id"]}")
+        item_id = get_itemid(db, caseid, rarity)
+        b_price = get_bprice(db, item_id)
         price = ((b_price[0]["base_price"]) / (condition_float + 0.5)).round(3)
-        case_price = db.execute("SELECT buy_price FROM cases WHERE id = #{caseid}")
+
+        p case_price[0]["buy_price"]
+        p user_id[0]["id"]
 
         balance_change("remove", case_price[0]["buy_price"], user_id[0]["id"])
 
-        db.execute("INSERT INTO u_item (user_id, item_id, condition_float, price) VALUES (?, ?, ?, ?)", user_id[0]["id"], item_id[0]["id"], condition_float, price)
+        new_item(db, user_id, item_id, condition_float, price)
 
     end
 
@@ -266,16 +222,14 @@ post("/sellItem/:id") do
 
     itemid = params[:id]
 
-    db = SQLite3::Database.new('db/database.db')
-    db.results_as_hash = true
+    db = db_initiate()
 
-    items_id = db.execute("SELECT id FROM u_item WHERE user_id = ? AND id = #{itemid}", decoded_token[0]['sub'])
-    item_price = db.execute("SELECT price FROM u_item WHERE id = #{itemid}")
-    user_id = db.execute("SELECT id FROM user WHERE id = ?", decoded_token[0]['sub'])
+    items_id = get_uitemid(db, itemid, decoded_token)
+    item_price = get_itemprice(db, itemid)
+    user_id = user_id_get(db, decoded_token)
 
-    
     if items_id[0]["id"].to_s == itemid
-        db.execute("DELETE FROM u_item WHERE id = #{items_id[0]['id']}")
+        deleteitem(db, items_id)
     end
 
     balance_change("add", item_price[0]["price"], user_id[0]["id"])
